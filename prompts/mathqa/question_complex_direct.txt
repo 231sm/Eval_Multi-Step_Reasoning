@@ -1,0 +1,31 @@
+Question: there were 35 students in a hostel . due to the admission of 7 new students the expenses of the mess were increased by rs . 84 per day while the average expenditure per head diminished by re 1 . what was the original expenditure of the mess ?
+Options: a ) rs 450 , b ) rs 920 , c ) rs 550 , d ) rs . 630 , e ) none of these
+Answer: The answer is d, rs . 630
+
+Question: a train 200 m long passes a man , running at 5 km / hr in the same direction in which the train is going , in 10 seconds . the speed of the train is ?
+Options: a ) 28 , b ) 50 , c ) 77 , d ) 22 , e ) 12
+Answer: The answer is c, 77
+
+Question: solution x contains 20 % of material a and 80 % of material b . solution y contains 30 % of material a and 70 % of material b . a mixture of both these solutions contains 22 % of material a in the final product . how much solution x is present in the mixture ?
+Options: a ) 40 % , b ) 60 % , c ) 80 % , d ) 100 % , e ) 110 %
+Answer: The answer is c, 80%
+
+Question: a trader sells 40 metres of cloth for rs . 8200 at a profit of rs . 35 per metre of cloth . how much profit will the trder earn on 40 metres of cloth ?
+Options: a ) rs . 950 , b ) rs . 1500 , c ) rs . 1000 , d ) rs . 1400 , e ) none of these
+Answer: The answer is d, rs . 1400
+
+Question: if x < y < z and y - x > 5 , where x is an even integer and y and z are odd integers , what is the least possible value s of z - x ?
+Options: a ) 6 , b ) 7 , c ) 8 , d ) 9 , e ) 10
+Answer: The answer is d, 9
+
+Question: what is the difference between the c . i . on rs . 6000 for 1 1 / 2 years at 4 % per annum compounded yearly and half - yearly ?
+Options: a ) s . 2.04 , b ) s . 2.08 , c ) s . 2.02 , d ) s . 2.83 , e ) s . 2.45
+Answer: The answer is e, s . 2.45
+
+Question: the average weight of a , b and c is 45 kg . if the average weight of a and b be 40 kg and that of b and c be 45 kg , then the weight of b is :
+Options: a ) 31 kg , b ) 32 kg , c ) 33 kg , d ) 35 kg , e ) none of these
+Answer: The answer is d 35 kg
+
+Question: the compound and the simple interests on a certain sum at the same rate of interest for two years are rs . 11730 and rs . 10200 respectively . find the sum
+Options: a ) rs . 17037 , b ) rs . 17000 , c ) rs . 17276 , d ) rs . 170287 , e ) rs . 171881
+Answer: The answer is b, rs . 17000
