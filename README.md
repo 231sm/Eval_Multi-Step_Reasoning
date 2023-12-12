@@ -1,7 +1,7 @@
-# Rethinking-Answer-Calibration-For-CoT
-Comprehensive Evaluation On Answer Calibration For CoT
+# Rethinking-Answer-Calibration-For-Multi-Step-Reasoning
+Comprehensive Evaluation On Answer Calibration For Multi-Step Reasoning
 
-This repository is an offical project for the EMNLP 2023 submission ``Rethinking Answer Calibration For Multi-Step Reasoning''.  
+This repository is an offical project for the NAACL 2024 submission ``Rethinking Answer Calibration For Multi-Step Reasoning''.  
 
 
 ## Usage
