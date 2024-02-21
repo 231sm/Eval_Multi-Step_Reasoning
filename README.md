@@ -1,7 +1,7 @@
 # Rethinking-Answer-Calibration-For-Multi-Step-Reasoning
 Comprehensive Evaluation On Answer Calibration For Multi-Step Reasoning
 
-This repository is an offical project for the ARR 2024 submission ``Rethinking Answer Calibration For Multi-Step Reasoning''.  
+This repository is an offical project for the ARR 2024 submission ''Towards A Unified View of Answer Calibration for Multi-Step Reasoning''.  
 
 
 ## Usage
