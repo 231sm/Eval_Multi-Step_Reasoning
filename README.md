@@ -38,9 +38,9 @@ sh eval_scores.sh
 ```bibtex
 @inproceedings{ACL2024_NLRSE_EvalReasoning,
     author    = {Shumin Deng and
-               Ningyu Zhang and
-               Nay Oo and
-               Bryan Hooi},
+                 Ningyu Zhang and
+                 Nay Oo and
+                 Bryan Hooi},
   title       = {Towards A Unified View of Answer Calibration for Multi-Step Reasoning},
   booktitle   = {Proceedings of the 2nd Workshop on Natural Language Reasoning and Structured Explanations (@ACL 2024)},
   publisher   = {Association for Computational Linguistics},
