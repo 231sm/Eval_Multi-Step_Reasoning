@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (c) EMNLP 2023 Submission
+# Copyright (c) # Copyright (c) ACL 2024, Natural Language Reasoning and Structured Explanations Workshop
 
 import datetime
 import os
@@ -16,7 +16,7 @@ import torch
 
 from constants import (
     COT_TRIGGER,
-    STR_GEN_STOP, 
+    STR_GEN_STOP,
     DICT_STR_SPLIT_RATIONALE
 )
 
@@ -25,10 +25,12 @@ def read_jsonl(path: str):
     with open(path, "r", encoding='utf-8') as fh:
         return [json.loads(line) for line in fh.readlines() if line]
 
+
 def read_json(path: str):
     with open(path, "r", encoding='utf-8') as file:
         return json.load(file)
-    
+
+
 def mkpath(path):
     if not os.path.exists(path):
         os.mkdir(path)
@@ -54,27 +56,34 @@ def get_update_inputs(dataset, prompt, question, model, engine, learning_type, d
         if learning_type == "zero_shot":
             system_content = "Please answer the question following the given instruction."
         list_messages.append({"role": "system", "content": system_content})
-        if not dialog_icl: # "zero_shot" must be not dialog_icl 
-            prompt_query = "Question: {}{}Answer: {}".format(question, DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP], DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP])
-            if learning_type == "few_shot": 
-                prompt_query = prompt + "{}{}".format(STR_GEN_STOP, prompt_query)
+        if not dialog_icl:  # "zero_shot" must be not dialog_icl
+            prompt_query = "Question: {}{}Answer: {}".format(
+                question, DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP], DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP])
+            if learning_type == "few_shot":
+                prompt_query = prompt + \
+                    "{}{}".format(STR_GEN_STOP, prompt_query)
             if model == "plan_solve":
                 prompt_query += make_plan_slove_instruction(dataset)
             else:
-                if COT_TRIGGER.lower() in prompt.lower() or learning_type == "zero_shot" and model != "self_verification": # cot, otherwise direct answer
-                    prompt_query += COT_TRIGGER + DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP]
+                if COT_TRIGGER.lower() in prompt.lower() or learning_type == "zero_shot" and model != "self_verification":  # cot, otherwise direct answer
+                    prompt_query += COT_TRIGGER + \
+                        DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP]
                 elif model == "self_verification":
                     prompt_query += DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP]
+                    # prompt_query = question + DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP]
             list_messages.append({"role": "user", "content": prompt_query})
         else:
-            list_messages.extend(make_dialog_prompt(dataset, prompt, question, model))
-        return list_messages  
-    else: # ["davinci", "text-davinci-002", "text-davinci-003"]
-        inputs = prompt + "{}Question: {}{}Answer: {}".format(STR_GEN_STOP, question, DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP], DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP]) 
+            list_messages.extend(make_dialog_prompt(
+                dataset, prompt, question, model))
+        return list_messages
+    else:  # ["davinci", "text-davinci-002", "text-davinci-003"]
+        inputs = prompt + "{}Question: {}{}Answer: {}".format(
+            STR_GEN_STOP, question, DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP], DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP])
         if model == "plan_solve":
             inputs += make_plan_slove_instruction(dataset)
         return inputs
- 
+
+
 def make_dialog_prompt(dataset, prompt, query, model):
     messages = []
     # messages.append({"role": "system", "content": "Follow the given examples and answer the question."})
@@ -91,44 +100,45 @@ def make_dialog_prompt(dataset, prompt, query, model):
     else:
         if COT_TRIGGER.lower() in prompt.lower():
             instruction = COT_TRIGGER
-        else: # direct
-            instruction = "The answer is " # ""  
+        else:  # direct
+            instruction = "The answer is "  # ""
     messages.append({"role": "user", "content": query + "\n" + instruction})
     return messages
+
 
 def make_plan_slove_instruction(dataset):
     prompt_101 = "Let's think step by step."
     prompt_201 = "Let's first understand the problem and devise a plan to solve the problem. " \
-                "Then, let's carry out the plan to solve the problem step by step."
+        "Then, let's carry out the plan to solve the problem step by step."
     prompt_301 = "Let's first understand the problem, extract relevant variables and their corresponding numerals, " \
-                "and devise a plan. Then, let's carry out the plan, calculate intermediate variables (pay attention to " \
-                "correct numeral calculation and commonsense), solve the problem step by step, and show the answer."
+        "and devise a plan. Then, let's carry out the plan, calculate intermediate variables (pay attention to " \
+    "correct numeral calculation and commonsense), solve the problem step by step, and show the answer."
     prompt_302 = "Let's first understand the problem, extract relevant variables and their corresponding numerals, " \
-                "and devise a complete plan. Then, let's carry out the plan, calculate intermediate variables " \
-                "(pay attention to correct numerical calculation and commonsense), " \
+        "and devise a complete plan. Then, let's carry out the plan, calculate intermediate variables " \
+    "(pay attention to correct numerical calculation and commonsense), " \
                 "solve the problem step by step, and show the answer."
     prompt_303 = "Let's devise a plan and solve the problem step by step."
     prompt_304 = "Let's first understand the problem and devise a complete plan. " \
-                "Then, let's carry out the plan and reason problem step by step. Every step answer the subquestion, " \
-                "\"does the person flip and what is the coin's current state?\". According to the coin's last state, " \
+        "Then, let's carry out the plan and reason problem step by step. Every step answer the subquestion, " \
+    "\"does the person flip and what is the coin's current state?\". According to the coin's last state, " \
                 "give the final answer (pay attention to every flip and the coin’s turning state)."
     prompt_305 = "Let's first understand the problem, extract relevant variables and their corresponding numerals, " \
-                "and make a complete plan. Then, let's carry out the plan, calculate intermediate variables (pay " \
-                "attention to correct numerical calculation and commonsense), " \
+        "and make a complete plan. Then, let's carry out the plan, calculate intermediate variables (pay " \
+    "attention to correct numerical calculation and commonsense), " \
                 "solve the problem step by step, and show the answer."
     prompt_306 = "Let's first prepare relevant information and make a plan. Then, let's answer the question step by step " \
-                "(pay attention to commonsense and logical coherence)."
+        "(pay attention to commonsense and logical coherence)."
     prompt_307 = "Let's first understand the problem, extract relevant variables and their corresponding numerals, " \
-                "and make and devise a complete plan. Then, let's carry out the plan, calculate intermediate variables " \
-                "(pay attention to correct numerical calculation and commonsense), " \
+        "and make and devise a complete plan. Then, let's carry out the plan, calculate intermediate variables " \
+    "(pay attention to correct numerical calculation and commonsense), " \
                 "solve the problem step by step, and show the answer."
     prompt_308 = "Let's first understand the problem, extract relevant variables and their corresponding numerals, " \
-                "and devise a complete plan. Then, let's carry out the plan, calculate intermediate variables " \
-                "(pay attention to correct numerical calculation), " \
+        "and devise a complete plan. Then, let's carry out the plan, calculate intermediate variables " \
+    "(pay attention to correct numerical calculation), " \
                 "solve the problem step by step, and show the answer."
     prompt_309 = "Let's first understand the problem, extract relevant commonsense or facts, " \
-                "and devise a complete plan. Then, let's carry out the plan, calculate intermediate commonsense or facts " \
-                "(pay attention to correct commonsense), " \
+        "and devise a complete plan. Then, let's carry out the plan, calculate intermediate commonsense or facts " \
+    "(pay attention to correct commonsense), " \
                 "solve the problem step by step, and show the answer."
     if dataset in ["gsm8k", "svamp", "multiarith", "mathqa"]:
         instruct_id = 308
@@ -139,6 +149,7 @@ def make_plan_slove_instruction(dataset):
     except NameError as e:
         raise NameError('can\'t find prompt_id: {}'.format(instruct_id))
 
+
 def tokenize(a):
     """
     lower, split, strip each token
@@ -148,14 +159,17 @@ def tokenize(a):
         b[ii] = b[ii].strip().strip('?.,\"\'').strip()
     return b
 
+
 def approx_eq(a, b):
     return abs(a - b) < 0.01
+
 
 def approx_in(b, array):
     for a in array:
         if approx_eq(a, b):
             return True
     return False
+
 
 def approx_overlap(a, b):
     count = 0
@@ -165,11 +179,13 @@ def approx_overlap(a, b):
         if approx_in(item, b):
             count += 1
     return count
-    
-def find_nums(string): # str list
+
+
+def find_nums(string):  # str list
     return re.findall(r"\d*\.?\d+(?:/\d*\.?\d+)?", string)
 
-def extract_nums(s): # int list
+
+def extract_nums(s):  # int list
     s = s.replace(",", "")
     nums = re.findall(r"[+-]? *(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", s)
     return_list = []
@@ -180,6 +196,7 @@ def extract_nums(s): # int list
             pass
     return return_list
 
+
 def extract_number(text: str, dataset) -> Union[float, None]:
     # text = text.replace(',', '')
     # pred = [s for s in re.findall(r'-?\d+\.?\d*', text)]
@@ -187,10 +204,10 @@ def extract_number(text: str, dataset) -> Union[float, None]:
     #     pred_answer = float(pred[-1])
     # else:
     #     pred_answer = None
-    return_list = extract_nums(text) 
+    return_list = extract_nums(text)
     if return_list:
-        if dataset == "multiarith|zero_shot": # "multiarith" 
-        # pred_answer = return_list[-1]
+        if dataset == "multiarith|zero_shot":  # "multiarith"
+            # pred_answer = return_list[-1]
             pred_answer = return_list[0]
         else:
             pred_answer = return_list[-1]
@@ -198,10 +215,12 @@ def extract_number(text: str, dataset) -> Union[float, None]:
         pred_answer = None
     return pred_answer
 
+
 def find_formula(step):
     assert step.count("<<") == step.count(">>") == 1
     left, right = step.find("<<")+2, step.find(">>")
     return step[left: right]
+
 
 def extract_finance(text):
     pattern = '-?\d+\.?\d*%?'
@@ -218,6 +237,7 @@ def extract_finance(text):
         return pred[-1]
     return None
 
+
 def extract_answer(text, dataset):
     if dataset in ["svamp", "gsm8k", "multiarith", "multiarith|zero_shot"]:
         pred_answer = extract_number(text, dataset)
@@ -229,8 +249,18 @@ def extract_answer(text, dataset):
         if len(list_candidate) > 0:
             pred_answer = list_candidate[-1]
         else:
-            pred_answer = "Z" 
+            pred_answer = "Z"
         # pred_answer = re.findall(r'A|B|C|D|E', pred)[0]
+        return pred_answer
+    elif dataset == "csqa_sv":
+        pred = text.strip()
+        _, raw_answer = get_rationale(pred)
+        if "yes" in raw_answer or "Yes" in raw_answer or "YES" in raw_answer:
+            pred_answer = "yes"
+        elif "no" in raw_answer or "No" in raw_answer or "NO" in raw_answer:
+            pred_answer = "no"
+        else:
+            pred_answer = "Z"
         return pred_answer
     elif dataset == "mathqa":
         pred = text.strip()
@@ -240,7 +270,7 @@ def extract_answer(text, dataset):
         if len(list_candidate) > 0:
             pred_answer = list_candidate[-1]
         else:
-            pred_answer = "z" 
+            pred_answer = "z"
         # pred_answer = [i for i in pred if i in ('A|B|C|D|E')][-1]
         # pred_answer = re.findall(r'a|b|c|d|e', pred)[0]
         return pred_answer
@@ -263,6 +293,7 @@ def extract_answer(text, dataset):
             pred_answer = float('inf')
     return pred_answer
 
+
 def extract_if_correct(completion):
     ANS_RE = re.compile(r"#### (\-?[0-9\.\,]+)")
     match = ANS_RE.search(completion)
@@ -273,18 +304,21 @@ def extract_if_correct(completion):
     else:
         assert False
 
+
 def test_answer(pred_str, ans_str):
     """Find the last number as the predicted answer"""
     pattern = '\d*\.?\d+'
     pred = re.findall(pattern, pred_str)
-    if(len(pred) >= 1):
+    if (len(pred) >= 1):
         # print(pred_str)
         pred = pred[-1]
         gold = re.findall(pattern, ans_str)
         # print(ans_str)
         gold = gold[-1]
         return pred == gold
-    else: return False 
+    else:
+        return False
+
 
 def save_scores(score_dict: Dict, out_path: str) -> None:
     # create destination directory if not exists
@@ -302,29 +336,31 @@ def save_scores(score_dict: Dict, out_path: str) -> None:
             print(out_line.format(i, *scores), file=output_file)
     print(f"Scores written to {out_path}")
 
-def get_rationale(input): # str --> str, str 
+
+def get_rationale(input):  # str --> str, str
     rationale = input
-    raw_answer = input.split(DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP])[-1].strip() 
+    raw_answer = input.split(
+        DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP])[-1].strip()
     list_answer_trigger = [
         "Therefore, the answer ", "therefore, the answer ", "therefore, The answer ", "Therefore, The answer ",
-        "Therefore the answer ", "therefore the answer ", "therefore The answer ", "Therefore The answer ", 
-        "Thus, the answer ", "thus, the answer ", "thus, The answer ", "Thus, The answer ", 
+        "Therefore the answer ", "therefore the answer ", "therefore The answer ", "Therefore The answer ",
+        "Thus, the answer ", "thus, the answer ", "thus, The answer ", "Thus, The answer ",
         "Thus the answer ", "thus the answer ", "thus The answer ", "Thus The answer ",
-        "So, the answer ", "so, the answer ", "so, The answer ", "So, The answer ", 
+        "So, the answer ", "so, the answer ", "so, The answer ", "So, The answer ",
         "So the answer ", "so the answer ", "so The answer ", "So The answer ",
         "Answer: ", "answer: ", "A: ",
-        "The answer: ", "The Answer: ", "the answer: ", "the Answer: ", 
+        "The answer: ", "The Answer: ", "the answer: ", "the Answer: ",
         "The answer ", "The Answer ", "the answer ", "the Answer ",
-        "The answer\n", "The Answer\n", "the answer\n", "the Answer\n"  
+        "The answer\n", "The Answer\n", "the answer\n", "the Answer\n"
     ]
-    for answer_trigger in list_answer_trigger: 
-        if answer_trigger in input :
+    for answer_trigger in list_answer_trigger:
+        if answer_trigger in input:
             index = input.rfind(answer_trigger)
             rationale = input[:index].strip()
             # raw_answer = input[index:].strip()
-            raw_answer = input[index+len(answer_trigger):].replace("is", "").strip().split(". ")[0].strip()
+            raw_answer = input[index+len(answer_trigger)                                         :].replace("is", "").strip().split(". ")[0].strip()
             # raw_answer = input[index+len(answer_trigger):].replace("is", "").strip()
-            break 
+            break
     return rationale, raw_answer
 
 
@@ -341,7 +377,8 @@ def cosine_similarity_scaled(list1: np.ndarray, list2: np.ndarray) -> float:
 
     Normalized cosine similarity takes values from [0;1]
     """
-    cosine_sim = np.dot(list1, list2) / (np.linalg.norm(list1) * np.linalg.norm(list2))
+    cosine_sim = np.dot(list1, list2) / \
+                        (np.linalg.norm(list1) * np.linalg.norm(list2))
     return (1.0 + cosine_sim) / 2.0
 
 
@@ -355,7 +392,8 @@ def embedding_alignment(ref_emb: np.ndarray, hypo_emb: np.ndarray) -> List[float
     for he in hypo_emb:
         # some embeddings can be empty. For example, for latex-style equations, or empty string
         if len(he) > 0:
-            out = [cosine_similarity_scaled(he, re) for re in ref_emb if len(re) > 0]
+            out = [cosine_similarity_scaled(he, re)
+                                            for re in ref_emb if len(re) > 0]
             if len(out) > 0:
                 scores.append(max(out))
     return scores
@@ -381,10 +419,11 @@ def split_gsm8k_llm_generations_to_steps(reasoning: str) -> List[str]:
     for i in range(len(predicted_rationale_tokens)):
         token = predicted_rationale_tokens[i]
         if "," in token[1:-1]:
-            token = token[0] + token[1:-1].replace(",","") + token[-1]
+            token = token[0] + token[1:-1].replace(",", "") + token[-1]
         predicted_rationale_tokens[i] = token
     predicted_rationale = " ".join(predicted_rationale_tokens)
-    predicted_steps = predicted_rationale.split(DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP])
+    predicted_steps = predicted_rationale.split(
+        DICT_STR_SPLIT_RATIONALE[STR_GEN_STOP])
     return predicted_steps
     # return [
     #     split
@@ -436,11 +475,11 @@ def ordered_union(list_of_lists: List[List[str]]) -> List[str]:
 
 def raw2id_on_question(filepath, subfold):
     for root, _dirnames, filenames in os.walk(filepath + subfold):
-            for filename in filenames:
-                if ".json" not in filename:
+          for filename in filenames:
+               if ".json" not in filename:
                     continue
                 raw_data = read_json(filename)
-    raw2id = dict() 
+    raw2id = dict()
     for item in raw_data:
         question = item["sQuestion"]
         raw2id[question] = item
@@ -458,7 +497,4 @@ def preprocess_multiarith(filepath, outpath):
         for line in list_preprocessed:
             json.dump(line, outfile)
             outfile.write('\n')
-    # return list_preprocessed 
-     
-
-
+    # return list_preprocessed

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (c) EMNLP 2023 Submission
+# Copyright (c) # Copyright (c) ACL 2024, Natural Language Reasoning and Structured Explanations Workshop
 
 """
 Evaluate perturbed synthetic dataset.
@@ -87,7 +87,8 @@ class SyntheticEvaluator(Evaluator):
             for line in _f:
                 jline = json.loads(line)
                 h_chain = SyntheticChain(line=jline["dialog"][0][0]["steps"])
-                r_chain = SyntheticChain(line=jline["dialog"][0][0]["original_steps"])
+                r_chain = SyntheticChain(
+                    line=jline["dialog"][0][0]["original_steps"])
                 context = SyntheticChain(
                     line=jline["dialog"][0][0]["question"].split(". ")
                 )

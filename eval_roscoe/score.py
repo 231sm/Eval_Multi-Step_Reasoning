@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (c) EMNLP 2023 Submission
+# Copyright (c) # Copyright (c) ACL 2024, Natural Language Reasoning and Structured Explanations Workshop
 
 from collections import defaultdict
 import itertools
@@ -36,7 +36,7 @@ except ImportError:
         "Scorer needs sentence transformer model installed. \n "
         "pip install -U sentence-transformers"
     )
-# # python 3.10.x seem don't support simcse 
+# # python 3.10.x seem don't support simcse
 # try:
 #     from simcse import SimCSE
 # except ImportError:
@@ -62,7 +62,7 @@ TRANSFORMER_MODELS_DICT = {
 # EMBEDDING_MODELS = list(TRANSFORMER_MODELS_DICT.keys()) + list(
 #     SIM_SCE_MODELS_DICT.keys()
 # )
-EMBEDDING_MODELS = list(TRANSFORMER_MODELS_DICT.keys()) 
+EMBEDDING_MODELS = list(TRANSFORMER_MODELS_DICT.keys())
 
 EMBEDDING_MODEL_NAMES = [m.split('/')[-1] for m in EMBEDDING_MODELS]
 
@@ -263,9 +263,9 @@ class Evaluator:
         references: Optional[List[Chain]] = None,
         score_types: List[str] = REASONING_SCORES,
         model_type: str = SENT_TRANS,
-        transformer_model: str = "all-MiniLM-L6-v2", # all-mpnet-base-v2
+        transformer_model: str = "all-MiniLM-L6-v2",  # all-mpnet-base-v2
         nli_model: str = NLI_MODEL_NAME,
-        ppl_model: str = "gpt2-large", # TurkuNLP/gpt3-finnish-small 
+        ppl_model: str = "gpt2-large",  # TurkuNLP/gpt3-finnish-small
         grammar_model: str = GRAMMAR_CHECK_MODEL_NAME,
         discourse_batch: int = 64,
         coherence_batch: int = 8,
@@ -278,7 +278,8 @@ class Evaluator:
         np.random.seed(random_seed)
 
         self.device = (
-            torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+            torch.device("cuda") if torch.cuda.is_available(
+            ) else torch.device("cpu")
         )
         self.references = references
         self.hypos = hypos
@@ -292,7 +293,8 @@ class Evaluator:
             )
             # Load model from HuggingFace Hub
             if self.word_model_name:
-                self.tokenizer = AutoTokenizer.from_pretrained(self.word_model_name)
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    self.word_model_name)
                 self.model = AutoModel.from_pretrained(self.word_model_name)
                 self.model.eval().to(self.device)
         if contains_nli_scores(score_types):
@@ -352,7 +354,7 @@ class Evaluator:
         #         SIM_SCE_MODELS_DICT[sentence_embedding_model],
         #     )
         if type == SIMSCE:
-            return (None, None) 
+            return (None, None)
         elif (
             type == SENT_TRANS
             and sentence_embedding_model in TRANSFORMER_MODELS_DICT.keys()
@@ -374,12 +376,14 @@ class Evaluator:
     def _build_ppl_model(
         self, model_id: str
     ) -> Tuple[PreTrainedModel, PreTrainedTokenizer]:
-        tokenizer = AutoTokenizer.from_pretrained(model_id, add_prefix_space=True)
+        tokenizer = AutoTokenizer.from_pretrained(
+            model_id, add_prefix_space=True)
         if tokenizer.pad_token is None:
             # GPT2 doesn't have a pad token. This hack allows for padding a batch of tensors,
             # and the attention mask will exclude the pad tokens from the loss.
             tokenizer.pad_token = tokenizer.eos_token
-        model = AutoModelForCausalLM.from_pretrained(model_id).eval().to(self.device)
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id).eval().to(self.device)
         return model, tokenizer
 
     def _build_grammaticality_classifier(
@@ -424,7 +428,7 @@ class Evaluator:
             if len(chain.chain) == 0:
                 chain.set_sentence_embeddings([[]])
             else:
-                embeddings = all_embeddings[index : index + len(chain.chain)]
+                embeddings = all_embeddings[index: index + len(chain.chain)]
                 chain.set_sentence_embeddings(embeddings)
             index += len(chain.chain)
 
@@ -458,7 +462,8 @@ class Evaluator:
             while j < len(pads) and pads[j][0] < i:
                 j += 1
             if j < len(pads) and pads[j][0] == i:
-                embeddings.append(emb[1 : pads[j][1] - 1].cpu().detach().numpy())
+                embeddings.append(
+                    emb[1: pads[j][1] - 1].cpu().detach().numpy())
             else:
                 embeddings.append(emb[1:-1].cpu().detach().numpy())
 
@@ -527,14 +532,16 @@ class Evaluator:
                             ra = max(
                                 ra,
                                 al_mean(
-                                    embedding_alignment(embeddings[j], embeddings[i])
+                                    embedding_alignment(
+                                        embeddings[j], embeddings[i])
                                 ),
                             )
                         # sentence embeddings
                         else:
                             ra = max(
                                 ra,
-                                cosine_similarity_scaled(embeddings[j], embeddings[i]),
+                                cosine_similarity_scaled(
+                                    embeddings[j], embeddings[i]),
                             )
 
             ra_most_similar_with_previous.append(ra)
@@ -564,7 +571,7 @@ class Evaluator:
         ind = 0
         while ind < len(all_pairs):
             cur_size = min(h_size, len(all_pairs) - ind)
-            pr, hyp = zip(*all_pairs[ind : ind + cur_size])
+            pr, hyp = zip(*all_pairs[ind: ind + cur_size])
             probs.extend(self.contradiction_probability(pr, hyp))
             ind += h_size
         return probs
@@ -594,7 +601,8 @@ class Evaluator:
         """
         results = []
         for i in range(0, len(steps), batch_size):
-            losses_n_tokens = self.cross_entropy_batch(steps[i : (i + batch_size)])
+            losses_n_tokens = self.cross_entropy_batch(
+                steps[i: (i + batch_size)])
             results.extend(losses_n_tokens)
         return results
 
@@ -631,7 +639,8 @@ class Evaluator:
             input_ids=input_ids, attention_mask=attn_mask
         )
 
-        assert len(losses) == len(batch), "Losses should be separated by example."
+        assert len(losses) == len(
+            batch), "Losses should be separated by example."
 
         return list(zip(losses, token_counts))
 
@@ -670,7 +679,8 @@ class Evaluator:
             label[:, :-target_len] = self.cross_entropy_loss.ignore_index
 
             with torch.no_grad():
-                outputs = self.ppl_model(input, attention_mask=mask, labels=label)
+                outputs = self.ppl_model(
+                    input, attention_mask=mask, labels=label)
 
                 # Copied from transformers GPT2LMHeadModel.forward implementation
                 # so we can get unreduced losses:
@@ -679,7 +689,8 @@ class Evaluator:
                 shift_labels = label[..., 1:].contiguous()
                 # Flatten the tokens
                 loss = self.cross_entropy_loss(
-                    shift_logits.view(-1, shift_logits.size(-1)), shift_labels.view(-1)
+                    shift_logits.view(-1, shift_logits.size(-1)
+                                      ), shift_labels.view(-1)
                 )
 
                 # unflatten
@@ -692,7 +703,8 @@ class Evaluator:
             nlls.append(neg_log_likelihood)
             total_tokens_scored += new_tokens
 
-        assert end_loc == input_ids.size(1), "we didn't get to the end of the sequence"
+        assert end_loc == input_ids.size(
+            1), "we didn't get to the end of the sequence"
         assert (
             total_tokens_scored.sum() == attention_mask.sum() - bsz
         ), "our loss hasn't been weighted properly"
@@ -735,7 +747,7 @@ class Evaluator:
         """
         results = []
         for i in range(0, len(steps), batch_size):
-            steps_batch = steps[i : (i + batch_size)]
+            steps_batch = steps[i: (i + batch_size)]
             probs = self.check_grammar_batch(steps_batch)
             results.extend(zip(steps_batch, probs))
         return results
@@ -800,8 +812,10 @@ class Evaluator:
                         np.append(
                             y_x_sent_emb,
                             embedding_alignment(
-                                ref_emb=self.linearize_array(c_word_embeddings),
-                                hypo_emb=self.linearize_array(h_word_embeddings),
+                                ref_emb=self.linearize_array(
+                                    c_word_embeddings),
+                                hypo_emb=self.linearize_array(
+                                    h_word_embeddings),
                             ),
                         )
                     )
@@ -928,7 +942,8 @@ class Evaluator:
         if PPL_STEP in score_types:
             scores[PPL_STEP] = 1 / _token_weighted_mean(step_perplexities)
         if PPL_CHAIN in score_types:
-            chain_ppl_results = self.perplexity([' '.join(hypo.chain)], self.ppl_batch)
+            chain_ppl_results = self.perplexity(
+                [' '.join(hypo.chain)], self.ppl_batch)
             chain_ppl = chain_ppl_results[0][0]
             scores[PPL_CHAIN] = 1 / chain_ppl
         if PPL_STEP_MAX in score_types:

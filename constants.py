@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (c) EMNLP 2023 Submission
+# Copyright (c) # Copyright (c) ACL 2024, Natural Language Reasoning and Structured Explanations Workshop
 
 from dataclasses import dataclass
 from enum import Enum
@@ -40,19 +40,29 @@ API_TIME_INTERVAL = 2.0
 
 TEMP_FOR_MULTI_CHAINS = 0.7
 N_FOR_MULTI_CHAINS = 10
-MAX_TOKEN_FOR_SELFVERIFY = 30
+MAX_TOKEN_FOR_SELFVERIFY = 180
 
-STR_GEN_STOP = "\n\n" # "\n"
+STR_GEN_STOP = "\n\n"  # "\n"
 DICT_STR_SPLIT_RATIONALE = {"\n\n": "\n", "\n": ". "}
 
 STR_TRIGGER_RESTORE = "restore"
 
-COT_TRIGGER = "Let's think step by step." 
+COT_TRIGGER = "Let's think step by step."
+
+DIRECT_TRIGGER = "Please provide a direct answer without additional explanation."
 
 PROMPT_NAME_ZSL = "NoNeed"
 
+N = 10
+M = 3
+THRESHOLD_1 = 1.0 / (1 + M * (N-2) / N)
+THRESHOLD_2 = 1.0 / (1 + 1 / N)
 
-############### SCORES
+M_CSQA = 10
+THRESHOLD_1_CSQA = 1.0 / (1 + M_CSQA * (N-2) / N)
+
+
+# SCORES
 ROUGE_1 = "rouge_1"
 ROUGE_2 = "rouge_2"
 ROUGE_L = "rouge_l"
@@ -62,7 +72,8 @@ BARTSCORE_F = "bartScore_f"
 BARTSCORE_CNN_F = "bartScore_cnn_f"
 BARTSCORE_CNN_PARA_F = "bartscore_cnn_para_f"
 BARTSCORE_FINETUNED_F = "bartscore_finetuned_f"
-PRISM_AVG = "prism_avg"  # note: we're actually using PRISM where it changes underlying behavior depending on references or not
+# note: we're actually using PRISM where it changes underlying behavior depending on references or not
+PRISM_AVG = "prism_avg"
 CTC_RELEVANCE_SUMMARY = "ctc_relevance_summary"
 CTC_CONSISTENCY_SUMMARY = "ctc_consistency_summary"
 
@@ -81,17 +92,17 @@ BASELINE_SCORES = [  # Use this to hide metrics we don't want to use anymore
     CTC_CONSISTENCY_SUMMARY,
 ]
 
-################ Paths
+# Paths
 DEFAULT_INPUT_ANN_PATH = f"./data/annotated/"
 DEFAULT_INPUT_GEN_PATH = f"./data/generated/"
 DEFAULT_INPUT_RES_PATH = f"./data/restored/"
-DEFAULT_PROMPT_PATH = f"./prompts/" 
+DEFAULT_PROMPT_PATH = f"./prompts/"
 DEFAULT_OUTPUT_PATH = f"./scores/"
 DEFAULT_LOG_PATH = f"./log/"
 
 
 DEFAULT_INPUT_PATH = f"./data/restored"
-################ Datasets
+# Datasets
 INPUT_DATA_FILES_HUMAN = {
     # "drop": f"{DEFAULT_INPUT_PATH}/drop.json",
     # "esnli": f"{DEFAULT_INPUT_PATH}/esnli.json",
@@ -102,7 +113,7 @@ INPUT_DATA_FILES_HUMAN = {
     "multiarith": f"{DEFAULT_INPUT_PATH}/multiarith.jsonl",
     "mathqa": f"{DEFAULT_INPUT_PATH}/mathqa.jsonl",
     "csqa": f"{DEFAULT_INPUT_PATH}/csqa.jsonl",
-    # "strategyqa": f"{DEFAULT_INPUT_PATH}/strategyqa.jsonl", 
+    # "strategyqa": f"{DEFAULT_INPUT_PATH}/strategyqa.jsonl",
 }
 INPUT_DATA_HUMAN = list(INPUT_DATA_FILES_HUMAN.keys())
 
@@ -119,7 +130,7 @@ INPUT_DATA_SYNTHETIC = [
 # DATASETS = INPUT_DATA_HUMAN + INPUT_DATA_SYNTHETIC
 DATASETS = INPUT_DATA_HUMAN
 
-############### Perturbations
+# Perturbations
 
 PERTURBATIONS = [
     "ShuffleSteps",

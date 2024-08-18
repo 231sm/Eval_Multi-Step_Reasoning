@@ -2,10 +2,11 @@
 # Usage:
 # sh setup.sh
 
-PROJECT_NAME="rethinking_answer_calibration_for_CoT"
+PROJECT_NAME="Eval_Multi-Step_Reasoning"
 
 DIR_EVAL_BASELINES="base_eval_models"
 
+# prepare project
 
 mkdir -p ../${DIR_EVAL_BASELINES}
 
